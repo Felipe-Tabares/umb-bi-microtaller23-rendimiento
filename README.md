@@ -4,6 +4,8 @@ Inteligencia de Negocios, Universidad Manuela Beltrán. Andrés Felipe Tabares B
 
 Identifica patrones en los resultados académicos de 32.593 matrículas reales y anónimas de la Open University (7 asignaturas, 2013 y 2014) y los muestra en un tablero interactivo con promedios, asignaturas críticas y niveles de desempeño.
 
+**Tablero en línea:** https://felipe-tabares.github.io/umb-bi-microtaller23-rendimiento/tablero/
+
 ## Cargar sus propios datos
 
 El tablero no sirve solo para la base incluida. Con el botón **Cargar Excel o CSV** (o arrastrando el archivo a la página) se sube una hoja de notas y todo se recalcula en el navegador; el archivo no sale del computador.
