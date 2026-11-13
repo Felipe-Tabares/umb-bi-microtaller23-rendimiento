@@ -14,35 +14,55 @@
     --text-secondary: #52514e;
     --text-muted: #7a7974;
     --grid: #ebeae6;
-    --acento: #184f95;
     --nivel-1: #184f95;  /* Distinción */
     --nivel-2: #5598e7;  /* Aprobó */
     --nivel-3: #e66767;  /* Reprobó */
     --nivel-4: #a82a2a;  /* Se retiró */
     --serie: #2a78d6;
+    --aviso: #fff6e0;
+    --error: #fdeceb;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--fondo); color: var(--text-primary);
          font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
   .envoltura { max-width: 1480px; margin: 0 auto; padding: 18px 20px 28px; }
-  header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 24px; margin-bottom: 14px; }
+  header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 24px; margin-bottom: 12px; }
   h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
   .sub { color: var(--text-secondary); margin: 2px 0 0; }
   .filtros { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
   .filtros label { display: flex; flex-direction: column; font-size: 12px; color: var(--text-secondary); gap: 3px; }
-  select, button { font: inherit; font-size: 13px; padding: 6px 10px; border: 1px solid var(--borde); border-radius: 8px;
-                   background: var(--surface-1); color: var(--text-primary); min-width: 150px; }
-  button { min-width: 0; cursor: pointer; }
+  select, button, input[type=number] { font: inherit; font-size: 13px; padding: 6px 10px; border: 1px solid var(--borde); border-radius: 8px;
+                   background: var(--surface-1); color: var(--text-primary); }
+  select { min-width: 150px; }
+  button { cursor: pointer; }
   button:hover, select:hover { border-color: #b9b8b2; }
+  button.principal { background: #184f95; color: #fff; border-color: #184f95; }
+  button.principal:hover { background: #104281; }
+  input[type=number] { width: 80px; }
+
+  .carga { background: var(--surface-1); border: 1px dashed #bdbcb6; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px;
+           display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+  .carga.arrastre { border-color: #184f95; background: #eef4fc; }
+  .carga .titulo { font-weight: 600; }
+  .carga .estado { color: var(--text-secondary); font-size: 13px; flex: 1 1 320px; min-width: 0; }
+  .carga .estado b { color: var(--text-primary); }
+  .carga label.escala { font-size: 12px; color: var(--text-secondary); display: none; align-items: center; gap: 6px; }
+  .mensaje { display: none; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; }
+  .mensaje.aviso { display: block; background: var(--aviso); border: 1px solid #f1d899; }
+  .mensaje.error { display: block; background: var(--error); border: 1px solid #f2b8b5; }
+
   .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
   .kpi { background: var(--surface-1); border: 1px solid var(--borde); border-radius: 12px; padding: 12px 14px; min-width: 0; }
   .kpi .nombre { font-size: 12px; color: var(--text-secondary); }
   .kpi .valor { font-size: 26px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .kpi .nota { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
   .rejilla { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; }
-  .tarjeta { background: var(--surface-1); border: 1px solid var(--borde); border-radius: 12px; padding: 14px 16px 12px; min-width: 0; }
+  .tarjeta { background: var(--surface-1); border: 1px solid var(--borde); border-radius: 12px; padding: 14px 16px 12px; min-width: 0; position: relative; }
   .tarjeta h2 { font-size: 15px; margin: 0; }
   .tarjeta p.lectura { margin: 2px 0 8px; color: var(--text-secondary); font-size: 12.5px; }
+  .vacio { display: none; position: absolute; inset: 64px 16px 16px; align-items: center; justify-content: center; text-align: center;
+           color: var(--text-muted); font-size: 13px; background: var(--surface-1); padding: 0 12px; }
+  .tarjeta.sin-datos .vacio { display: flex; }
   .c7 { grid-column: span 7; } .c5 { grid-column: span 5; } .c4 { grid-column: span 4; } .c12 { grid-column: span 12; }
   .lienzo { position: relative; height: 270px; }
   .leyenda { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--text-secondary); margin: 0 0 6px; }
@@ -50,7 +70,7 @@
   .leyenda i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
   th, td { text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
-  th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+  th:first-child, td:first-child, th.izq, td.izq { text-align: left; }
   th { font-weight: 600; color: var(--text-secondary); font-size: 12px; }
   tr.critica td { font-weight: 650; }
   tr.sel td { background: #eef4fc; }
@@ -74,19 +94,30 @@
   <header>
     <div>
       <h1>Rendimiento académico</h1>
-      <p class="sub">32.593 matrículas reales y anónimas de 7 asignaturas · Open University, 2013 y 2014</p>
+      <p class="sub" id="descripcion"></p>
     </div>
     <div class="filtros">
       <label>Asignatura <select id="f-asig"></select></label>
-      <label>Cohorte <select id="f-coh"></select></label>
-      <label>Formación previa <select id="f-form"></select></label>
+      <label id="l-coh"><span id="t-coh">Cohorte</span> <select id="f-coh"></select></label>
+      <label id="l-form"><span id="t-form">Formación previa</span> <select id="f-form"></select></label>
       <button id="limpiar" type="button">Quitar filtros</button>
     </div>
   </header>
 
+  <section class="carga" id="zona-carga" aria-label="Cargar datos">
+    <span class="titulo">Datos</span>
+    <span class="estado" id="estado-datos"></span>
+    <label class="escala" id="l-escala">Nota mínima para aprobar <input type="number" id="aprueba" step="0.1" min="0"></label>
+    <input type="file" id="archivo" accept=".xlsx,.xls,.csv" hidden>
+    <button class="principal" type="button" id="btn-cargar">Cargar Excel o CSV</button>
+    <button type="button" id="btn-plantilla">Descargar plantilla</button>
+    <button type="button" id="btn-incluidos" hidden>Volver a los datos incluidos</button>
+  </section>
+  <div class="mensaje" id="mensaje"></div>
+
   <section class="kpis" aria-label="Indicadores">
     <div class="kpi"><div class="nombre">Matrículas analizadas</div><div class="valor" id="k-n"></div><div class="nota" id="k-n2"></div></div>
-    <div class="kpi"><div class="nombre">Promedio de evaluaciones</div><div class="valor" id="k-prom"></div><div class="nota">de 0 a 100 · se aprueba con 40</div></div>
+    <div class="kpi"><div class="nombre">Promedio de evaluaciones</div><div class="valor" id="k-prom"></div><div class="nota" id="k-prom2"></div></div>
     <div class="kpi"><div class="nombre">Tasa de aprobación</div><div class="valor" id="k-apr"></div><div class="nota" id="k-apr2"></div></div>
     <div class="kpi"><div class="nombre">Tasa de reprobación</div><div class="valor" id="k-rep"></div><div class="nota">terminó y no aprobó</div></div>
     <div class="kpi"><div class="nombre">Tasa de retiro</div><div class="valor" id="k-ret"></div><div class="nota">se fue antes de terminar</div></div>
@@ -100,106 +131,243 @@
       <div class="leyenda" id="leyenda-niveles"></div>
       <div class="lienzo" style="height:300px"><canvas id="g-niveles" aria-label="Niveles de desempeño por asignatura"></canvas></div>
     </section>
-    <section class="tarjeta c5">
+    <section class="tarjeta c5" id="t-promedio">
       <h2>Promedio de evaluaciones por asignatura</h2>
-      <p class="lectura">Mismo orden que la gráfica de al lado: el promedio no sigue el orden de la aprobación.</p>
+      <p class="lectura" id="lectura-promedio"></p>
       <div class="lienzo" style="height:322px"><canvas id="g-promedio" aria-label="Promedio de evaluaciones por asignatura"></canvas></div>
+      <div class="vacio">El archivo no trae notas para calcular el promedio.</div>
     </section>
-    <section class="tarjeta c4">
+    <section class="tarjeta c4" id="t-entrega">
       <h2>Entrega de cada evaluación del semestre</h2>
       <p class="lectura">De cada 100 matriculados, cuántos entregaron la evaluación.</p>
       <div class="lienzo"><canvas id="g-entrega" aria-label="Porcentaje de entrega por evaluación"></canvas></div>
+      <div class="vacio">El archivo no trae columnas de evaluaciones (nota_1, nota_2...).</div>
     </section>
-    <section class="tarjeta c4">
+    <section class="tarjeta c4" id="t-primera">
       <h2>Aprobación según la primera evaluación</h2>
-      <p class="lectura">Nota en la primera evaluación del semestre, que en cinco de las siete asignaturas llega entre los días 12 y 25.</p>
+      <p class="lectura" id="lectura-primera"></p>
       <div class="lienzo"><canvas id="g-primera" aria-label="Aprobación según la nota de la primera evaluación"></canvas></div>
+      <div class="vacio">El archivo no trae columnas de evaluaciones (nota_1, nota_2...).</div>
     </section>
-    <section class="tarjeta c4">
+    <section class="tarjeta c4" id="t-clics">
       <h2>Aprobación según la actividad del primer mes</h2>
-      <p class="lectura">Clics en la plataforma en las primeras 4 semanas, en cinco grupos del mismo tamaño (debajo, el rango de clics).</p>
-      <div class="lienzo"><canvas id="g-clics" aria-label="Aprobación según los clics en las primeras cuatro semanas"></canvas></div>
+      <p class="lectura" id="lectura-clics"></p>
+      <div class="lienzo"><canvas id="g-clics" aria-label="Aprobación según la actividad del primer mes"></canvas></div>
+      <div class="vacio">El archivo no trae la columna actividad_primer_mes.</div>
     </section>
     <section class="tarjeta c12">
       <h2>Tabla por asignatura</h2>
-      <p class="lectura">Las mismas cifras de las gráficas, con los filtros de cohorte y formación previa aplicados.</p>
+      <p class="lectura" id="lectura-tabla"></p>
       <div class="tabla-scroll"><table id="tabla"></table></div>
     </section>
   </div>
 
-  <footer>
-    Fuente: Open University Learning Analytics Dataset (Kuzilek, Hlosta y Zdrahal, 2017), licencia CC BY 4.0. Datos reales anonimizados; las asignaturas solo vienen con código.
-    Aprobación = Distinción + Aprobó sobre todas las matrículas. Promedio = nota media de las evaluaciones entregadas.
-    Los dos patrones de abajo solo cuentan a quienes seguían inscritos el día de la primera evaluación o al terminar la semana 4.
-  </footer>
+  <footer id="pie"></footer>
 </div>
 
 <script src="chart.umd.js"></script>
+<script src="xlsx.full.min.js"></script>
 <script src="datos.js"></script>
 <script>
 (() => {
-  const D = window.DATOS;
+  const RESULTADOS = ['Distinción', 'Aprobó', 'Reprobó', 'Se retiró'];
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const C = {
     niveles: [css('--nivel-1'), css('--nivel-2'), css('--nivel-3'), css('--nivel-4')],
     serie: css('--serie'), sup: css('--surface-1'), t1: css('--text-primary'), t2: css('--text-secondary'),
     t3: css('--text-muted'), grid: css('--grid'),
   };
-  const nombreAsig = Object.fromEntries(D.asignaturas.map(a => [a.id, `${a.id} · ${a.area}`]));
+  const $ = id => document.getElementById(id);
   const fmt = (x, d = 1) => x.toLocaleString('es-CO', { minimumFractionDigits: d, maximumFractionDigits: d });
   const ent = x => x.toLocaleString('es-CO');
   const pct = (a, b) => b ? 100 * a / b : 0;
 
-  // filtros
-  const sel = { a: '', c: '', f: '' };
-  const llenar = (id, ops, todas) => {
-    const s = document.getElementById(id);
-    s.innerHTML = `<option value="">${todas}</option>` + ops.map(o => `<option value="${o.v}">${o.t}</option>`).join('');
-    return s;
+  // ------------------------------------------------------------------ conjunto de datos
+  // Toda fuente (los datos incluidos o un Excel) se lleva a la misma forma:
+  // filas = [{a, c, f, r, p, e1, xp, q, qg, ev}], con a, c, f índices a dic.
+  let ds = null;
+
+  function incluidos() {
+    const D = window.DATOS;
+    const filas = D.a.map((_, i) => ({ a: D.a[i], c: D.c[i], f: D.f[i], r: D.r[i], p: D.p[i], e1: D.e1[i],
+      xp: D.xp[i], q: D.q[i], qg: D.qg[i], ev: D.ev[i] }));
+    return { nombre: D.nombre, descripcion: D.descripcion, fuente: D.fuente, escala: { ...D.escala }, escalaFija: true,
+             dic: D.dic, areas: D.areas, nombrePeriodo: D.nombre_periodo, nombreSegmento: D.nombre_segmento,
+             nombreActividad: D.nombre_actividad, qEtiquetas: D.q_etiquetas, filas, hayEv: true, hayAct: true, hayProm: true,
+             incluido: true };
+  }
+
+  const fmtNum = v => Number.isInteger(v) ? ent(v) : fmt(v);
+  const fmtNota = v => ds && ds.escala.max <= 10 ? fmt(v) : fmtNum(v);
+  // quintiles por rango (empates resueltos por orden de aparición), como en el análisis de Python
+  function calcularQuintiles(d) {
+    const con = d.filas.map((f, i) => [f.q, i]).filter(x => x[0] != null).sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+    const m = con.length, lim = [0, 1, 2, 3, 4].map(() => [Infinity, -Infinity]);
+    d.filas.forEach(f => { f.qg = -1; });
+    con.forEach(([v, i], k) => {
+      const g = Math.min(4, Math.floor(k * 5 / m));
+      d.filas[i].qg = g; lim[g][0] = Math.min(lim[g][0], v); lim[g][1] = Math.max(lim[g][1], v);
+    });
+    d.qEtiquetas = lim.map(([a, b]) => a === Infinity ? 'sin datos' : `${fmtNum(a)} a ${fmtNum(b)}`);
+  }
+
+  // ------------------------------------------------------------------ lectura de un Excel o CSV
+  const norm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  const SINONIMOS = {
+    asignatura: ['asignatura', 'materia', 'curso', 'modulo', 'code_module'],
+    periodo: ['periodo', 'cohorte', 'semestre', 'ano', 'anio', 'code_presentation'],
+    segmento: ['segmento', 'grupo', 'jornada', 'programa', 'sede', 'formacion_previa'],
+    resultado: ['resultado', 'estado', 'nivel', 'nivel_desempeno', 'desempeno', 'final_result'],
+    nota_final: ['nota_final', 'definitiva', 'nota_definitiva', 'final', 'promedio_final', 'promedio'],
+    actividad: ['actividad_primer_mes', 'actividad', 'clics', 'ingresos', 'asistencia', 'asistencias'],
   };
-  const sA = llenar('f-asig', D.asignaturas.map(a => ({ v: a.id, t: nombreAsig[a.id] })), 'Todas');
-  const sC = llenar('f-coh', D.cohortes.map(c => ({ v: c, t: c })), 'Todas');
-  const sF = llenar('f-form', D.formaciones.map(f => ({ v: f, t: f })), 'Todas');
-  sA.onchange = () => { sel.a = sA.value; pintar(); };
-  sC.onchange = () => { sel.c = sC.value; pintar(); };
-  sF.onchange = () => { sel.f = sF.value; pintar(); };
-  document.getElementById('limpiar').onclick = () => { sel.a = sel.c = sel.f = ''; sA.value = sC.value = sF.value = ''; pintar(); };
+  const RE_EVAL = /^(nota|eval|evaluacion|corte|parcial|taller|quiz)_?(\d+)$/;
+  const numero = v => {
+    if (v == null || v === '') return null;
+    if (typeof v === 'number') return isFinite(v) ? v : null;
+    const t = String(v).trim().replace(/\s/g, '').replace(',', '.');
+    const x = Number(t);
+    return t === '' || !isFinite(x) ? null : x;
+  };
+  const nivelDeTexto = v => {
+    const t = norm(v);
+    if (!t) return null;
+    if (t.includes('distin') || t.includes('excelen') || t.includes('superior')) return 0;
+    if (t.includes('reprob') || t.includes('perdi') || t.includes('fail') || t === 'no_aprobo') return 2;
+    if (t.includes('aprob') || t.includes('gano') || t.includes('pass')) return 1;
+    if (t.includes('retir') || t.includes('cancel') || t.includes('withdr') || t.includes('desert')) return 3;
+    return null;
+  };
 
-  document.getElementById('leyenda-niveles').innerHTML =
-    D.resultados.map((r, i) => `<span><i style="background:${C.niveles[i]}"></i>${r}</span>`).join('');
+  function desdeHoja(filasCrudas, nombreArchivo) {
+    if (!filasCrudas.length) throw new Error('El archivo no tiene filas con datos.');
+    const columnas = Object.keys(filasCrudas[0]);
+    const mapa = {};
+    for (const col of columnas) {
+      const n = norm(col);
+      for (const [campo, lista] of Object.entries(SINONIMOS)) if (!mapa[campo] && lista.includes(n)) mapa[campo] = col;
+    }
+    const evals = columnas.map(col => ({ col, m: norm(col).match(RE_EVAL) })).filter(x => x.m && x.col !== mapa.nota_final)
+      .sort((x, y) => +x.m[2] - +y.m[2]).map(x => x.col);
+    const faltan = [];
+    if (!mapa.asignatura) faltan.push('asignatura');
+    if (!mapa.resultado && !mapa.nota_final && !evals.length) faltan.push('resultado, nota_final o columnas nota_1, nota_2...');
+    if (faltan.length) throw new Error(`Faltan columnas: ${faltan.join(' y ')}. Columnas encontradas: ${columnas.join(', ')}. Descargue la plantilla para ver el formato.`);
 
-  // suma de grupos
-  const sumar = grupos => {
-    const s = { n: 0, r: [0, 0, 0, 0], sp: 0, np: 0,
-                ev: Array.from({ length: D.max_orden }, () => [0, 0, 0]),
-                p1: D.rangos_nota.map(() => [0, 0]), q4: [0, 1, 2, 3, 4].map(() => [0, 0]) };
-    for (const g of grupos) {
-      s.n += g.n; s.sp += g.sp; s.np += g.np;
-      g.r.forEach((v, i) => s.r[i] += v);
-      g.ev.forEach((v, i) => { s.ev[i][0] += v[0]; s.ev[i][1] += v[1]; s.ev[i][2] += v[2]; });
-      g.p1.forEach((v, i) => { s.p1[i][0] += v[0]; s.p1[i][1] += v[1]; });
-      g.q4.forEach((v, i) => { s.q4[i][0] += v[0]; s.q4[i][1] += v[1]; });
+    // escala: se adivina por la nota más alta y el usuario la puede corregir
+    let maxNota = 0;
+    for (const fc of filasCrudas) for (const col of [mapa.nota_final, ...evals]) {
+      if (!col) continue; const x = numero(fc[col]); if (x != null && x > maxNota) maxNota = x;
+    }
+    const escala = maxNota <= 5 ? { max: 5, aprueba: 3 } : maxNota <= 10 ? { max: 10, aprueba: 6 } : { max: 100, aprueba: 60 };
+
+    const dic = { a: [], c: [], f: [] };
+    const idx = (k, v) => { let i = dic[k].indexOf(v); if (i < 0) { dic[k].push(v); i = dic[k].length - 1; } return i; };
+    let descartadas = 0, fueraDeEscala = 0, nivelesSinLeer = 0;
+    const filas = [];
+    const leerNota = v => { const x = numero(v); if (x == null) return null; if (x < 0 || x > escala.max) { fueraDeEscala++; return null; } return x; };
+    for (const fc of filasCrudas) {
+      const asig = String(fc[mapa.asignatura] ?? '').trim();
+      if (!asig) { descartadas++; continue; }
+      const ev = evals.map(col => leerNota(fc[col]));
+      const conNota = ev.filter(x => x != null);
+      const final = mapa.nota_final ? leerNota(fc[mapa.nota_final]) : null;
+      const r = mapa.resultado ? nivelDeTexto(fc[mapa.resultado]) : null;
+      if (mapa.resultado && r == null && String(fc[mapa.resultado] ?? '').trim()) nivelesSinLeer++;
+      filas.push({
+        a: idx('a', asig),
+        c: idx('c', mapa.periodo ? String(fc[mapa.periodo] ?? '').trim() || 'Sin dato' : 'Todos'),
+        f: idx('f', mapa.segmento ? String(fc[mapa.segmento] ?? '').trim() || 'Sin dato' : 'Todos'),
+        r, rTexto: r != null, final,
+        p: conNota.length ? conNota.reduce((s, x) => s + x, 0) / conNota.length : final,
+        e1: evals.length ? ev[0] : null, xp: 0,
+        q: mapa.actividad ? numero(fc[mapa.actividad]) : null, qg: -1, ev,
+      });
+    }
+    if (!filas.length) throw new Error('Ninguna fila tiene asignatura.');
+    const d = { nombre: nombreArchivo, descripcion: '', escala, escalaFija: false, dic, areas: null,
+                nombrePeriodo: mapa.periodo ? 'Periodo' : null, nombreSegmento: mapa.segmento ? mapa.segmento.trim() : null,
+                nombreActividad: mapa.actividad ? mapa.actividad.trim() : null, filas,
+                hayEv: evals.length > 0, hayAct: !!mapa.actividad, hayProm: filas.some(f => f.p != null),
+                derivaNivel: !mapa.resultado || filas.some(f => !f.rTexto), columnas: { ...mapa, evals },
+                avisos: { descartadas, fueraDeEscala, nivelesSinLeer } };
+    derivarNiveles(d);
+    if (d.hayAct) calcularQuintiles(d);
+    return d;
+  }
+
+  // nivel a partir de la nota cuando el archivo no trae resultado
+  function derivarNiveles(d) {
+    const { max, aprueba } = d.escala;
+    for (const f of d.filas) {
+      if (f.rTexto || d.incluido) continue;
+      const nota = f.final ?? f.p;
+      f.r = nota == null ? 3 : nota >= 0.9 * max ? 0 : nota >= aprueba ? 1 : 2;
+    }
+  }
+
+  // ------------------------------------------------------------------ cálculo
+  function cortes(esc) {
+    const { max, aprueba } = esc, ent10 = max > 10;
+    const r = x => ent10 ? Math.round(x) : Math.round(x * 10) / 10;
+    const c1 = r(aprueba), c2 = r(aprueba + (max - aprueba) / 3), c3 = r(aprueba + 2 * (max - aprueba) / 3);
+    const menos = x => ent10 ? fmtNum(x - 1) : fmt(Math.round((x - 0.1) * 10) / 10);
+    const f = x => ent10 ? fmtNum(x) : fmt(x);
+    return { c: [c1, c2, c3], etiquetas: ['No la entregó', `Menos de ${f(c1)}`, `${f(c1)} a ${menos(c2)}`, `${f(c2)} a ${menos(c3)}`, `${f(c3)} a ${f(max)}`] };
+  }
+  function sumar(filas, k) {
+    const s = { n: 0, r: [0, 0, 0, 0], sp: 0, np: 0, ev: [], p1: [0, 1, 2, 3, 4].map(() => [0, 0]), q4: [0, 1, 2, 3, 4].map(() => [0, 0]) };
+    for (const f of filas) {
+      s.n++; s.r[f.r]++;
+      if (f.p != null) { s.sp += f.p; s.np++; }
+      const aprobo = f.r <= 1 ? 1 : 0;
+      if (f.ev) f.ev.forEach((x, i) => {
+        if (!s.ev[i]) s.ev[i] = [0, 0, 0];
+        s.ev[i][0]++; if (x != null) { s.ev[i][1]++; s.ev[i][2] += x; }
+      });
+      if (ds.hayEv && !f.xp) {
+        const b = f.e1 == null ? 0 : f.e1 < k.c[0] ? 1 : f.e1 < k.c[1] ? 2 : f.e1 < k.c[2] ? 3 : 4;
+        s.p1[b][0] += aprobo; s.p1[b][1]++;
+      }
+      if (f.qg >= 0) { s.q4[f.qg][0] += aprobo; s.q4[f.qg][1]++; }
     }
     s.apr = pct(s.r[0] + s.r[1], s.n);
     s.prom = s.np ? s.sp / s.np : 0;
     return s;
-  };
-  const pasaCF = g => (!sel.c || g.c === sel.c) && (!sel.f || g.f === sel.f);
+  }
 
+  // ------------------------------------------------------------------ filtros
+  const sel = { a: '', c: '', f: '' };
+  const sA = $('f-asig'), sC = $('f-coh'), sF = $('f-form');
+  const nombreAsig = i => ds.dic.a[i] + (ds.areas && ds.areas[ds.dic.a[i]] ? ` · ${ds.areas[ds.dic.a[i]]}` : '');
+  function llenarFiltros() {
+    const llenar = (s, ops) => { s.innerHTML = '<option value="">Todas</option>' + ops.map((t, i) => `<option value="${i}">${t}</option>`).join(''); };
+    llenar(sA, ds.dic.a.map((_, i) => nombreAsig(i)));
+    llenar(sC, ds.dic.c); llenar(sF, ds.dic.f);
+    $('l-coh').style.display = ds.dic.c.length > 1 ? '' : 'none';
+    $('l-form').style.display = ds.dic.f.length > 1 ? '' : 'none';
+    $('t-coh').textContent = ds.nombrePeriodo || 'Periodo';
+    $('t-form').textContent = ds.nombreSegmento ? ds.nombreSegmento.charAt(0).toUpperCase() + ds.nombreSegmento.slice(1).replace(/_/g, ' ') : 'Grupo';
+    sel.a = sel.c = sel.f = '';
+  }
+  sA.onchange = () => { sel.a = sA.value; pintar(); };
+  sC.onchange = () => { sel.c = sC.value; pintar(); };
+  sF.onchange = () => { sel.f = sF.value; pintar(); };
+  $('limpiar').onclick = () => { sel.a = sel.c = sel.f = ''; sA.value = sC.value = sF.value = ''; pintar(); };
+  $('leyenda-niveles').innerHTML = RESULTADOS.map((r, i) => `<span><i style="background:${C.niveles[i]}"></i>${r}</span>`).join('');
+
+  // ------------------------------------------------------------------ gráficas
   Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
   Chart.defaults.font.size = 12;
   Chart.defaults.color = C.t2;
   Chart.defaults.plugins.legend.display = false;
   Chart.defaults.animation.duration = 250;
-  const tip = { backgroundColor: '#1f1f1d', titleColor: '#fff', bodyColor: '#f0efec', padding: 10, cornerRadius: 8,
-                displayColors: true, boxPadding: 4 };
+  const tip = { backgroundColor: '#1f1f1d', titleColor: '#fff', bodyColor: '#f0efec', padding: 10, cornerRadius: 8, boxPadding: 4 };
   const ejes = (yMax, ySuf) => ({
     x: { grid: { display: false }, border: { color: C.grid }, ticks: { color: C.t2, maxRotation: 0, autoSkip: false } },
-    y: { min: 0, max: yMax, grid: { color: C.grid }, border: { display: false },
-         ticks: { color: C.t3, callback: v => v + ySuf, maxTicksLimit: 6 } },
+    y: { min: 0, max: yMax, grid: { color: C.grid }, border: { display: false }, ticks: { color: C.t3, callback: v => v + ySuf, maxTicksLimit: 6 } },
   });
-  // etiqueta de valor encima de cada barra (pocas barras: se rotulan todas)
-  const rotulos = {
+  Chart.register({
     id: 'rotulos',
     afterDatasetsDraw(ch, _, o) {
       if (!o || !o.activo) return;
@@ -207,18 +375,17 @@
       ctx.font = `600 12px ${Chart.defaults.font.family}`; ctx.fillStyle = C.t1; ctx.textAlign = 'center';
       ch.getDatasetMeta(0).data.forEach((b, i) => {
         const v = ch.data.datasets[0].data[i];
-        if (v == null) return;
-        ctx.fillText(fmt(v) + (o.suf || ''), b.x, b.y - 6);
+        if (v != null) ctx.fillText(fmt(v) + (o.suf || ''), b.x, b.y - 6);
       });
       ctx.restore();
     },
-  };
-  Chart.register(rotulos);
+  });
+  const alternarAsig = i => { const v = String(i); sel.a = sel.a === v ? '' : v; sA.value = sel.a; pintar(); };
+  const cursor = (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; };
 
-  // 1. niveles por asignatura (barras apiladas al 100 %)
-  const gNiv = new Chart(document.getElementById('g-niveles'), {
+  const gNiv = new Chart($('g-niveles'), {
     type: 'bar',
-    data: { labels: [], datasets: D.resultados.map((r, i) => ({ label: r, data: [], backgroundColor: [],
+    data: { labels: [], datasets: RESULTADOS.map((r, i) => ({ label: r, data: [], backgroundColor: [],
             borderColor: C.sup, borderWidth: { left: 0, right: 2, top: 0, bottom: 0 }, borderSkipped: false, barPercentage: 0.78 })) },
     options: {
       indexAxis: 'y', maintainAspectRatio: false,
@@ -227,56 +394,44 @@
         y: { stacked: true, grid: { display: false }, border: { color: C.grid }, ticks: { color: C.t1 } },
       },
       plugins: { tooltip: { ...tip, mode: 'index', callbacks: {
-        title: it => nombreAsig[gNiv._ids[it[0].dataIndex]],
+        title: it => nombreAsig(gNiv._ids[it[0].dataIndex]),
         label: it => ` ${it.dataset.label}: ${fmt(it.raw)} %  (${ent(gNiv._cuentas[it.dataIndex][it.datasetIndex])})`,
         footer: it => `Aprobación: ${fmt(it[0].raw + it[1].raw)} % · ${ent(gNiv._n[it[0].dataIndex])} matrículas`,
       } } },
-      onClick: (_, els) => {
-        if (!els.length) return;
-        const id = gNiv._ids[els[0].index];
-        sel.a = sel.a === id ? '' : id; sA.value = sel.a; pintar();
-      },
-      onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+      onClick: (_, els) => { if (els.length) alternarAsig(gNiv._ids[els[0].index]); },
+      onHover: cursor,
     },
   });
 
-  // 2. promedio por asignatura
-  const gProm = new Chart(document.getElementById('g-promedio'), {
+  const gProm = new Chart($('g-promedio'), {
     type: 'bar',
     data: { labels: [], datasets: [{ label: 'Promedio', data: [], backgroundColor: [], borderRadius: 4, borderSkipped: 'start', barPercentage: 0.7 }] },
     options: {
-      indexAxis: 'y', maintainAspectRatio: false,
+      indexAxis: 'y', maintainAspectRatio: false, layout: { padding: { right: 36 } },
       scales: {
-        x: { min: 0, max: 100, grid: { color: C.grid }, border: { display: false }, ticks: { color: C.t3 } },
+        x: { min: 0, max: 100, grid: { color: C.grid }, border: { display: false }, ticks: { color: C.t3, callback: v => ds && ds.escala.max <= 10 ? fmt(v) : v } },
         y: { grid: { display: false }, border: { color: C.grid }, ticks: { color: C.t1 } },
       },
-      plugins: {
-        tooltip: { ...tip, displayColors: false, callbacks: {
-          title: it => nombreAsig[gProm._ids[it[0].dataIndex]],
-          label: it => `Promedio: ${fmt(it.raw)} de 100`,
-          afterLabel: it => `Aprobación: ${fmt(gProm._apr[it.dataIndex])} %`,
-        } },
-      },
-      onClick: (_, els) => {
-        if (!els.length) return;
-        const id = gProm._ids[els[0].index];
-        sel.a = sel.a === id ? '' : id; sA.value = sel.a; pintar();
-      },
-      onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+      plugins: { tooltip: { ...tip, displayColors: false, callbacks: {
+        title: it => nombreAsig(gProm._ids[it[0].dataIndex]),
+        label: it => `Promedio: ${fmt(it.raw)} de ${fmtNum(ds.escala.max)}`,
+        afterLabel: it => `Aprobación: ${fmt(gProm._apr[it.dataIndex])} %`,
+      } } },
+      onClick: (_, els) => { if (els.length) alternarAsig(gProm._ids[els[0].index]); },
+      onHover: cursor,
     },
     plugins: [{
       id: 'valorFinal',
       afterDatasetsDraw(ch) {
         const ctx = ch.ctx; ctx.save();
         ctx.font = `600 12px ${Chart.defaults.font.family}`; ctx.fillStyle = C.t1; ctx.textBaseline = 'middle';
-        ch.getDatasetMeta(0).data.forEach((b, i) => ctx.fillText(fmt(ch.data.datasets[0].data[i]), b.x + 6, b.y));
+        ch.getDatasetMeta(0).data.forEach((b, i) => { const v = ch.data.datasets[0].data[i]; if (v != null) ctx.fillText(fmt(v), b.x + 6, b.y); });
         ctx.restore();
       },
     }],
   });
 
-  // 3. entrega por evaluación (línea)
-  const gEnt = new Chart(document.getElementById('g-entrega'), {
+  const gEnt = new Chart($('g-entrega'), {
     type: 'line',
     data: { labels: [], datasets: [{ label: 'Entregaron', data: [], borderColor: C.serie, backgroundColor: C.serie,
             borderWidth: 2, pointRadius: 4, pointHoverRadius: 6, pointBorderColor: C.sup, pointBorderWidth: 2, tension: 0 }] },
@@ -301,11 +456,9 @@
     }],
   });
 
-  // 4 y 5. tasas de aprobación por grupo
-  const barrasTasa = (id, etiquetas, titulo) => new Chart(document.getElementById(id), {
+  const barrasTasa = (id, titulo) => new Chart($(id), {
     type: 'bar',
-    data: { labels: etiquetas, datasets: [{ label: 'Aprobación', data: [], backgroundColor: C.serie, borderRadius: 4,
-            borderSkipped: 'start', barPercentage: 0.72 }] },
+    data: { labels: [], datasets: [{ label: 'Aprobación', data: [], backgroundColor: C.serie, borderRadius: 4, borderSkipped: 'start', barPercentage: 0.72 }] },
     options: {
       maintainAspectRatio: false, layout: { padding: { top: 18 } },
       scales: ejes(100, ' %'),
@@ -319,77 +472,184 @@
       },
     },
   });
-  const gPri = barrasTasa('g-primera', [['No la', 'entregó'], ['Menos', 'de 40'], ['40 a 59'], ['60 a 79'], ['80 a 100']], it => `Primera evaluación: ${D.rangos_nota[it.dataIndex].toLowerCase()}`);
-  const gCli = barrasTasa('g-clics', D.quintiles.map((q, i, l) => [`Grupo ${i + 1}`, i === 0 ? `hasta ${q.split(' a ')[1]}` : i === l.length - 1 ? `${q.split(' a ')[0]} o más` : q]), it => `Grupo ${it.dataIndex + 1}: ${D.quintiles[it.dataIndex]} clics en el primer mes`);
+  const gPri = barrasTasa('g-primera', it => `Primera evaluación: ${gPri._etq[it.dataIndex].toLowerCase()}`);
+  const gCli = barrasTasa('g-clics', it => `Grupo ${it.dataIndex + 1}: ${ds.qEtiquetas[it.dataIndex]} ${ds.nombreActividad || ''}`);
+  const partir = t => { const w = t.split(' '); if (w.length < 3) return t; const m = Math.ceil(w.length / 2); return [w.slice(0, m).join(' '), w.slice(m).join(' ')]; };
 
+  // ------------------------------------------------------------------ pintar
   function pintar() {
-    const gruposCF = D.grupos.filter(pasaCF);
-    const gruposSel = gruposCF.filter(g => !sel.a || g.a === sel.a);
-    const s = sumar(gruposSel);
-
-    // por asignatura (para gráficas 1 y 2, la tabla y el KPI crítico)
-    const porA = D.asignaturas.map(a => ({ id: a.id, area: a.area, ...sumar(gruposCF.filter(g => g.a === a.id)) }))
+    const k = cortes(ds.escala);
+    const pasaCF = f => (sel.c === '' || f.c === +sel.c) && (sel.f === '' || f.f === +sel.f);
+    const filasCF = ds.filas.filter(pasaCF);
+    const s = sumar(filasCF.filter(f => sel.a === '' || f.a === +sel.a), k);
+    const minimo = Math.min(30, Math.max(5, Math.floor(filasCF.length / 20)));
+    const porA = ds.dic.a.map((_, i) => ({ id: i, ...sumar(filasCF.filter(f => f.a === i), k) }))
       .filter(x => x.n > 0).sort((x, y) => x.apr - y.apr);
-    const candidatas = porA.filter(x => x.n >= 30 && (!sel.a || x.id === sel.a));
-    const crit = candidatas[0];
+    const crit = porA.filter(x => x.n >= minimo && (sel.a === '' || x.id === +sel.a))[0];
+    const hayFiltro = sel.a !== '' || sel.c !== '' || sel.f !== '';
 
-    // KPI
-    document.getElementById('k-n').textContent = ent(s.n);
-    document.getElementById('k-n2').textContent = sel.a || sel.c || sel.f ? 'con los filtros aplicados' : '28.785 estudiantes distintos';
-    document.getElementById('k-prom').textContent = s.np ? fmt(s.prom) : 'sin datos';
-    document.getElementById('k-apr').textContent = fmt(s.apr) + ' %';
-    document.getElementById('k-apr2').textContent = `distinción ${fmt(pct(s.r[0], s.n))} % + aprobó ${fmt(pct(s.r[1], s.n))} %`;
-    document.getElementById('k-rep').textContent = fmt(pct(s.r[2], s.n)) + ' %';
-    document.getElementById('k-ret').textContent = fmt(pct(s.r[3], s.n)) + ' %';
-    document.getElementById('k-crit').textContent = crit ? crit.id : 'sin datos';
-    document.getElementById('k-crit2').textContent = crit ? `${crit.area.toLowerCase()} · aprueba el ${fmt(crit.apr)} %` : 'muy pocos registros';
+    $('k-n').textContent = ent(s.n);
+    $('k-n2').textContent = hayFiltro ? 'con los filtros aplicados' : ds.incluido ? '28.785 estudiantes distintos' : `${ds.dic.a.length} asignaturas`;
+    $('k-prom').textContent = s.np ? fmt(s.prom) : 'sin datos';
+    $('k-prom2').textContent = `de 0 a ${fmtNum(ds.escala.max)} · se aprueba con ${fmtNota(ds.escala.aprueba)}`;
+    $('k-apr').textContent = fmt(s.apr) + ' %';
+    $('k-apr2').textContent = `distinción ${fmt(pct(s.r[0], s.n))} % + aprobó ${fmt(pct(s.r[1], s.n))} %`;
+    $('k-rep').textContent = fmt(pct(s.r[2], s.n)) + ' %';
+    $('k-ret').textContent = fmt(pct(s.r[3], s.n)) + ' %';
+    $('k-crit').textContent = crit ? ds.dic.a[crit.id] : 'sin datos';
+    $('k-crit2').textContent = crit ? `${ds.areas ? ds.areas[ds.dic.a[crit.id]].toLowerCase() + ' · ' : ''}aprueba el ${fmt(crit.apr)} %` : 'muy pocos registros';
 
-    // 1. niveles
-    const atenuar = (color, id) => sel.a && sel.a !== id ? color + '55' : color;
+    const atenuar = (color, id) => sel.a !== '' && +sel.a !== id ? color + '55' : color;
     gNiv._ids = porA.map(x => x.id); gNiv._n = porA.map(x => x.n); gNiv._cuentas = porA.map(x => x.r);
-    gNiv.data.labels = porA.map(x => x.id + (x === porA[0] ? '  (crítica)' : ''));
-    gNiv.data.datasets.forEach((ds, i) => {
-      ds.data = porA.map(x => +pct(x.r[i], x.n).toFixed(1));
-      ds.backgroundColor = porA.map(x => atenuar(C.niveles[i], x.id));
+    gNiv.data.labels = porA.map((x, i) => ds.dic.a[x.id] + (i === 0 && porA.length > 1 ? '  (crítica)' : ''));
+    gNiv.data.datasets.forEach((d, i) => {
+      d.data = porA.map(x => +pct(x.r[i], x.n).toFixed(1));
+      d.backgroundColor = porA.map(x => atenuar(C.niveles[i], x.id));
     });
     gNiv.update();
 
-    // 2. promedio, mismo orden
+    $('t-promedio').classList.toggle('sin-datos', !ds.hayProm);
+    $('lectura-promedio').textContent = ds.incluido
+      ? 'Mismo orden que la gráfica de al lado: el promedio no sigue el orden de la aprobación.'
+      : 'Mismo orden que la gráfica de al lado, para comparar el promedio con la aprobación.';
     gProm._ids = porA.map(x => x.id); gProm._apr = porA.map(x => x.apr);
-    gProm.data.labels = porA.map(x => x.id);
-    gProm.data.datasets[0].data = porA.map(x => +x.prom.toFixed(1));
+    gProm.options.scales.x.max = ds.escala.max;
+    gProm.data.labels = porA.map(x => ds.dic.a[x.id]);
+    gProm.data.datasets[0].data = porA.map(x => x.np ? +x.prom.toFixed(1) : null);
     gProm.data.datasets[0].backgroundColor = porA.map(x => atenuar(C.serie, x.id));
     gProm.update();
 
-    // 3. entrega
+    $('t-entrega').classList.toggle('sin-datos', !ds.hayEv);
     const ev = s.ev.map((v, i) => ({ k: i + 1, ins: v[0], e: v[1], suma: v[2] })).filter(v => v.ins > 0);
     gEnt._prom = ev.map(v => v.e ? v.suma / v.e : 0);
     gEnt.data.labels = ev.map(v => String(v.k));
     gEnt.data.datasets[0].data = ev.map(v => +pct(v.e, v.ins).toFixed(1));
     gEnt.update();
 
-    // 4 y 5
-    gPri._n = s.p1.map(v => v[1]);
-    gPri.data.datasets[0].data = s.p1.map(v => v[1] >= 20 ? +pct(v[0], v[1]).toFixed(1) : null);
+    const minGrupo = ds.incluido ? 20 : 3;
+    $('t-primera').classList.toggle('sin-datos', !ds.hayEv);
+    $('lectura-primera').textContent = ds.incluido
+      ? 'Nota en la primera evaluación del semestre, que en cinco de las siete asignaturas llega entre los días 12 y 25.'
+      : `Nota en la primera evaluación (columna ${ds.columnas.evals[0] || 'nota_1'}).`;
+    gPri._n = s.p1.map(v => v[1]); gPri._etq = k.etiquetas;
+    gPri.data.labels = k.etiquetas.map(partir);
+    gPri.data.datasets[0].data = s.p1.map(v => v[1] >= minGrupo ? +pct(v[0], v[1]).toFixed(1) : null);
     gPri.update();
+
+    $('t-clics').classList.toggle('sin-datos', !ds.hayAct);
+    $('lectura-clics').textContent = ds.incluido
+      ? 'Clics en la plataforma en las primeras 4 semanas, en cinco grupos del mismo tamaño (debajo, el rango de clics).'
+      : `Columna ${ds.nombreActividad || 'actividad_primer_mes'}, en cinco grupos del mismo tamaño, de menos a más.`;
     gCli._n = s.q4.map(v => v[1]);
-    gCli.data.datasets[0].data = s.q4.map(v => v[1] >= 20 ? +pct(v[0], v[1]).toFixed(1) : null);
+    const qe = ds.qEtiquetas || [];
+    gCli.data.labels = qe.map((q, i, l) => [`Grupo ${i + 1}`, ds.incluido && i === 0 ? `hasta ${q.split(' a ')[1]}` : ds.incluido && i === l.length - 1 ? `${q.split(' a ')[0]} o más` : q]);
+    gCli.data.datasets[0].data = s.q4.map(v => v[1] >= minGrupo ? +pct(v[0], v[1]).toFixed(1) : null);
     gCli.update();
 
-    // tabla
-    const filas = porA.map((x, i) => `<tr class="${i === 0 ? 'critica' : ''} ${sel.a === x.id ? 'sel' : ''}">
-      <td>${x.id}${i === 0 ? '<span class="marca">más crítica</span>' : ''}</td><td>${x.area}</td>
-      <td>${ent(x.n)}</td><td>${fmt(x.prom)}</td><td>${fmt(x.apr)} %</td><td>${fmt(pct(x.r[0], x.n))} %</td>
+    const conArea = !!ds.areas;
+    $('lectura-tabla').textContent = 'Las mismas cifras de las gráficas, con los filtros de periodo y grupo aplicados.';
+    const filas = porA.map((x, i) => `<tr class="${i === 0 ? 'critica' : ''} ${sel.a !== '' && +sel.a === x.id ? 'sel' : ''}">
+      <td>${ds.dic.a[x.id]}${i === 0 && porA.length > 1 ? '<span class="marca">más crítica</span>' : ''}</td>${conArea ? `<td class="izq">${ds.areas[ds.dic.a[x.id]]}</td>` : ''}
+      <td>${ent(x.n)}</td><td>${x.np ? fmt(x.prom) : ''}</td><td>${fmt(x.apr)} %</td><td>${fmt(pct(x.r[0], x.n))} %</td>
       <td>${fmt(pct(x.r[1], x.n))} %</td><td>${fmt(pct(x.r[2], x.n))} %</td><td>${fmt(pct(x.r[3], x.n))} %</td></tr>`).join('');
-    document.getElementById('tabla').innerHTML = `<thead><tr><th>Asignatura</th><th>Área</th><th>Matrículas</th><th>Promedio</th>
+    $('tabla').innerHTML = `<thead><tr><th>Asignatura</th>${conArea ? '<th class="izq">Área</th>' : ''}<th>Matrículas</th><th>Promedio</th>
       <th>Aprobación</th><th>Distinción</th><th>Aprobó</th><th>Reprobó</th><th>Se retiró</th></tr></thead><tbody>${filas}</tbody>`;
   }
-  // filtro desde la dirección, por ejemplo #asig=CCC (sirve para capturas y para el video)
+
+  // ------------------------------------------------------------------ fuente de datos en pantalla
+  function mostrarFuente() {
+    const esc = ds.escala;
+    if (ds.incluido) {
+      $('descripcion').textContent = ds.descripcion;
+      $('estado-datos').innerHTML = `Mostrando <b>${ds.nombre}</b>. Puede cargar su propio Excel con notas y el tablero se recalcula.`;
+      $('pie').textContent = `Fuente: ${ds.fuente} Aprobación = Distinción + Aprobó sobre todas las matrículas. Promedio = nota media de las evaluaciones entregadas. Los dos patrones de abajo solo cuentan a quienes seguían inscritos el día de la primera evaluación o al terminar la semana 4.`;
+    } else {
+      $('descripcion').textContent = `${ent(ds.filas.length)} registros de ${ds.dic.a.length} asignaturas · archivo ${ds.nombre}`;
+      $('estado-datos').innerHTML = `Mostrando <b>${ds.nombre}</b> · ${ent(ds.filas.length)} registros · escala de 0 a ${fmtNum(esc.max)}`;
+      const col = ds.columnas;
+      $('pie').textContent = `Fuente: archivo ${ds.nombre}, cargado por el usuario. Columnas usadas: asignatura = ${col.asignatura}` +
+        (col.periodo ? `, periodo = ${col.periodo}` : '') + (col.segmento ? `, grupo = ${col.segmento}` : '') +
+        (col.resultado ? `, resultado = ${col.resultado}` : '') + (col.nota_final ? `, nota final = ${col.nota_final}` : '') +
+        (col.evals.length ? `, evaluaciones = ${col.evals.join(', ')}` : '') + (col.actividad ? `, actividad = ${col.actividad}` : '') +
+        (ds.derivaNivel ? `. Donde no hay resultado, el nivel sale de la nota: distinción desde ${fmt(0.9 * esc.max)}, aprobó desde ${fmtNota(esc.aprueba)} y sin nota cuenta como retiro.` : '.');
+    }
+    $('l-escala').style.display = ds.escalaFija ? 'none' : 'inline-flex';
+    $('aprueba').value = esc.aprueba;
+    $('btn-incluidos').hidden = !!ds.incluido;
+  }
+  function usar(d) { ds = d; llenarFiltros(); mostrarFuente(); pintar(); }
+
+  function avisar(texto, tipo) { const m = $('mensaje'); m.className = 'mensaje ' + (texto ? tipo : ''); m.textContent = texto || ''; }
+
+  async function cargarArchivo(nombre, buffer) {
+    try {
+      const libro = XLSX.read(buffer, { type: 'array' });
+      const hoja = libro.Sheets[libro.SheetNames.find(n => norm(n) === 'datos') || libro.SheetNames[0]];
+      const crudas = XLSX.utils.sheet_to_json(hoja, { defval: null, raw: true });
+      const d = desdeHoja(crudas, nombre);
+      usar(d);
+      const a = d.avisos, partes = [];
+      if (a.descartadas) partes.push(`${a.descartadas} filas sin asignatura se dejaron por fuera`);
+      if (a.fueraDeEscala) partes.push(`${a.fueraDeEscala} notas por fuera de la escala de 0 a ${fmtNum(d.escala.max)} se tomaron como vacías`);
+      if (a.nivelesSinLeer) partes.push(`${a.nivelesSinLeer} resultados con texto desconocido se calcularon con la nota`);
+      avisar(partes.length ? `Archivo cargado. Ojo: ${partes.join('; ')}.` : '', 'aviso');
+    } catch (e) {
+      avisar(`No se pudo cargar ${nombre}. ${e.message}`, 'error');
+    }
+  }
+  const leer = archivo => archivo.arrayBuffer().then(b => cargarArchivo(archivo.name, b));
+  $('btn-cargar').onclick = () => $('archivo').click();
+  $('archivo').onchange = e => { const a = e.target.files[0]; if (a) leer(a); e.target.value = ''; };
+  const zona = $('zona-carga');
+  ['dragenter', 'dragover'].forEach(t => document.addEventListener(t, e => { e.preventDefault(); zona.classList.add('arrastre'); }));
+  ['dragleave', 'drop'].forEach(t => document.addEventListener(t, e => { e.preventDefault(); if (t === 'drop' || !e.relatedTarget) zona.classList.remove('arrastre'); }));
+  document.addEventListener('drop', e => { const a = e.dataTransfer.files[0]; if (a) leer(a); });
+  $('btn-incluidos').onclick = () => { avisar(''); usar(incluidos()); };
+  $('aprueba').onchange = () => {
+    const x = numero($('aprueba').value);
+    if (x == null || x <= 0 || x > ds.escala.max) { $('aprueba').value = ds.escala.aprueba; return; }
+    ds.escala.aprueba = x; derivarNiveles(ds); mostrarFuente(); pintar();
+  };
+  $('btn-plantilla').onclick = () => {
+    const libro = XLSX.utils.book_new();
+    const datos = [
+      ['estudiante', 'asignatura', 'periodo', 'jornada', 'nota_1', 'nota_2', 'nota_3', 'nota_final', 'resultado', 'actividad_primer_mes'],
+      ['EST-001', 'Cálculo Integral', '2026-2', 'Nocturna', 3.8, 4.1, 3.5, 3.8, 'Aprobó', 7],
+      ['EST-002', 'Cálculo Integral', '2026-2', 'Nocturna', 2.1, null, null, null, 'Se retiró', 2],
+      ['EST-003', 'Programación', '2026-2', 'Diurna', 4.6, 4.8, 4.7, 4.7, '', 8],
+    ];
+    const ayuda = [
+      ['Plantilla del tablero de rendimiento académico'],
+      ['Una fila por estudiante y asignatura. Borre las 3 filas de ejemplo de la hoja Datos y pegue las suyas.'],
+      [''],
+      ['Columna', 'Obligatoria', 'Qué va'],
+      ['asignatura', 'Sí', 'Nombre o código de la asignatura (también sirve materia o curso)'],
+      ['nota_1, nota_2, ...', 'Recomendada', 'Nota de cada evaluación en orden (también sirve corte_1, parcial_1). Vacía = no la entregó'],
+      ['nota_final', 'Si no hay resultado ni notas', 'Nota definitiva (también sirve definitiva)'],
+      ['resultado', 'No', 'Distinción, Aprobó, Reprobó o Se retiró. Si se deja vacío, sale de la nota final'],
+      ['periodo', 'No', 'Semestre o cohorte, por ejemplo 2026-2'],
+      ['jornada', 'No', 'Un grupo para filtrar: jornada, programa o sede'],
+      ['actividad_primer_mes', 'No', 'Número de asistencias, ingresos o clics en las primeras 4 semanas'],
+      ['estudiante', 'No', 'Código del estudiante; no se muestra en el tablero'],
+      [''],
+      ['La escala se detecta sola (0 a 5, 0 a 10 o 0 a 100) y la nota mínima para aprobar se puede cambiar en el tablero.'],
+    ];
+    XLSX.utils.book_append_sheet(libro, XLSX.utils.aoa_to_sheet(datos), 'Datos');
+    XLSX.utils.book_append_sheet(libro, XLSX.utils.aoa_to_sheet(ayuda), 'Instrucciones');
+    XLSX.writeFile(libro, 'Plantilla-Rendimiento-Academico.xlsx');
+  };
+
+  // filtros o archivo desde la dirección, por ejemplo #asig=CCC (sirve para capturas y para el video)
+  usar(incluidos());
   const h = new URLSearchParams(location.hash.slice(1));
-  if (h.get('asig')) { sel.a = sA.value = h.get('asig'); }
-  if (h.get('coh')) { sel.c = sC.value = h.get('coh'); }
-  if (h.get('form')) { sel.f = sF.value = h.get('form'); }
-  pintar();
+  const aplicarHash = () => {
+    const i = ds.dic.a.indexOf(h.get('asig'));
+    if (i >= 0) { sel.a = sA.value = String(i); pintar(); }
+  };
+  if (h.get('archivo')) {
+    fetch(h.get('archivo')).then(r => r.arrayBuffer()).then(b => cargarArchivo(h.get('archivo').split('/').pop(), b)).then(aplicarHash)
+      .catch(e => avisar('No se pudo abrir ' + h.get('archivo') + ': ' + e.message, 'error'));
+  } else aplicarHash();
 })();
 </script>
 </body>

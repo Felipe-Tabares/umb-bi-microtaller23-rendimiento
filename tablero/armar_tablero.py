@@ -3,7 +3,7 @@ from pathlib import Path
 
 T = Path(__file__).resolve().parent
 html = (T / "index.html").read_text(encoding="utf-8")
-for nombre in ("chart.umd.js", "datos.js"):
+for nombre in ("chart.umd.js", "xlsx.full.min.js", "datos.js"):
     codigo = (T / nombre).read_text(encoding="utf-8").replace("</script", "<\\/script")
     html = html.replace(f'<script src="{nombre}"></script>', f"<script>\n{codigo}\n</script>")
 salida = T.parent / "entrega" / "Tablero-Rendimiento-Academico.html"

@@ -179,42 +179,46 @@ res = {
 }
 (RAIZ / "analisis" / "resultados.json").write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
 
-# ---------------------------------------------------------------- 6. agregados para el tablero
-# clave = asignatura | cohorte | formación; el tablero suma las claves que dejen pasar los filtros
+# ---------------------------------------------------------------- 6. datos del tablero, fila por fila
+# El tablero calcula todo en el navegador a partir de filas, igual que con un Excel que suba el usuario.
 asigs = sorted(base["asignatura"].unique())
 cohs = list(COHORTE.values())
-ok1 = ok1.set_index(ok1.index)
-grupos = []
-base["rango_primera"] = base["nota_primera_evaluacion"].map(rango_nota)
-base["q_clics"] = np.nan
-base.loc[ok4.index, "q_clics"] = ok4["quintil_clics"]
-evo = evo.merge(base[["asignatura", "id_estudiante", "cohorte", "formacion_previa"]].assign(
-    code_module=base["asignatura"], code_presentation=base["cohorte"].map({v: k for k, v in COHORTE.items()})),
-    left_on=["code_module", "code_presentation", "id_student"],
-    right_on=["code_module", "code_presentation", "id_estudiante"])
-max_orden = int(cont["orden"].max())
-for (a, c, f), g in base.groupby(["asignatura", "cohorte", "formacion_previa"]):
-    ge = evo[(evo["asignatura"] == a) & (evo["cohorte"] == c) & (evo["formacion_previa"] == f)]
-    eo = ge.groupby("orden")["score"].agg(["size", "sum"])
-    n_ev = int(cont[(cont["code_module"] == a) & (cont["code_presentation"].map(COHORTE) == c)]["orden"].max())
-    g1 = g[g["activo_en_primera_evaluacion"]]
-    g4 = g[g["activo_semana_4"]]
-    grupos.append({
-        "a": a, "c": c, "f": f, "n": len(g),
-        "r": [int((g["nivel_desempeno"] == r).sum()) for r in ORDEN_RES],
-        "sp": round(float(g["promedio_evaluaciones"].sum()), 1), "np": int(g["promedio_evaluaciones"].notna().sum()),
-        # por orden de evaluación: [inscritos que la tenían, entregas, suma de notas]
-        "ev": [[len(g) if k <= n_ev else 0, int(eo["size"].get(k, 0)), round(float(eo["sum"].get(k, 0)), 1)] for k in range(1, max_orden + 1)],
-        "p1": [[int(((g1["rango_primera"] == rr) & (g1["aprobo"] == "Sí")).sum()), int((g1["rango_primera"] == rr).sum())] for rr in RANGOS_NOTA],
-        "q4": [[int(((g4["q_clics"] == q) & (g4["aprobo"] == "Sí")).sum()), int((g4["q_clics"] == q).sum())] for q in range(5)],
-    })
+sc = sa[sa["assessment_type"] != "Exam"][CLAVE + ["id_assessment", "score"]].merge(cont[["id_assessment", "orden"]], on="id_assessment")
+ancho = sc.pivot_table(index=CLAVE, columns="orden", values="score", aggfunc="first")
+n_ev = cont.groupby(["code_module", "code_presentation"])["orden"].max()
+inv_coh = {v: k for k, v in COHORTE.items()}
+base["q_grupo"] = -1
+base.loc[ok4.index, "q_grupo"] = ok4["quintil_clics"].astype(int)
+num = lambda x: None if pd.isna(x) else (int(x) if float(x).is_integer() else round(float(x), 1))
+ev_filas = []
+for a, c, s in zip(base["asignatura"], base["cohorte"], base["id_estudiante"]):
+    pc = inv_coh[c]
+    n = int(n_ev[(a, pc)])
+    fila = ancho.loc[(a, pc, s)] if (a, pc, s) in ancho.index else None
+    ev_filas.append([None if fila is None else num(fila.get(k)) for k in range(1, n + 1)])
 datos_tablero = {
-    "asignaturas": [{"id": a, "area": AREA[a]} for a in asigs], "cohortes": cohs, "formaciones": ORDEN_FORM,
-    "resultados": ORDEN_RES, "rangos_nota": RANGOS_NOTA,
-    "quintiles": [f"{patron_clics[q]['min']} a {patron_clics[q]['max']}" for q in range(5)],
-    "grupos": grupos, "max_orden": max_orden,
+    "nombre": "Open University (datos reales incluidos)",
+    "descripcion": "32.593 matrículas reales y anónimas de 7 asignaturas · Open University, 2013 y 2014",
+    "fuente": "Open University Learning Analytics Dataset (Kuzilek, Hlosta y Zdrahal, 2017), licencia CC BY 4.0. Datos reales anonimizados; las asignaturas solo vienen con código.",
+    "escala": {"max": 100, "aprueba": 40},
+    "nombre_segmento": "Formación previa", "nombre_periodo": "Cohorte",
+    "nombre_actividad": "clics en la plataforma",
+    "areas": AREA,
+    "dic": {"a": asigs, "c": cohs, "f": ORDEN_FORM},
+    "q_etiquetas": [f"{patron_clics[q]['min']} a {patron_clics[q]['max']}" for q in range(5)],
+    "a": [asigs.index(x) for x in base["asignatura"]],
+    "c": [cohs.index(x) for x in base["cohorte"]],
+    "f": [ORDEN_FORM.index(x) for x in base["formacion_previa"]],
+    "r": [ORDEN_RES.index(x) for x in base["nivel_desempeno"]],
+    "p": [num(x) for x in base["promedio_evaluaciones"]],
+    "e1": [num(x) for x in base["nota_primera_evaluacion"]],
+    "xp": [0 if x else 1 for x in base["activo_en_primera_evaluacion"]],
+    "q": [int(x) if ok else None for x, ok in zip(base["clics_primeras_4_semanas"], base["activo_semana_4"])],
+    "qg": [int(x) for x in base["q_grupo"]],
+    "ev": ev_filas,
 }
 (RAIZ / "tablero" / "datos.js").write_text("window.DATOS = " + json.dumps(datos_tablero, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
+grupos = base
 
 # ---------------------------------------------------------------- 7. resumen en consola
 g = res["general"]
@@ -237,4 +241,4 @@ for q in range(5):
 print("\nPor formación previa:", {k: v["aprobacion"] for k, v in form.items()})
 print("Por intentos previos:", {k: (v["aprobacion"], v["n"]) for k, v in intentos.items()})
 print("Promedio por nivel:", res["promedio_por_nivel"])
-print(f"\ndatos.js: {len(grupos)} grupos · {(RAIZ / 'tablero' / 'datos.js').stat().st_size // 1024} KB")
+print(f"\ndatos.js: {len(grupos)} filas · {(RAIZ / 'tablero' / 'datos.js').stat().st_size // 1024} KB")
