@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rendimiento Académico</title>
+<style>
+  :root {
+    color-scheme: light;
+    --fondo: #f4f3f0;
+    --surface-1: #fcfcfb;
+    --borde: #e3e2de;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #7a7974;
+    --grid: #ebeae6;
+    --acento: #184f95;
+    --nivel-1: #184f95;  /* Distinción */
+    --nivel-2: #5598e7;  /* Aprobó */
+    --nivel-3: #e66767;  /* Reprobó */
+    --nivel-4: #a82a2a;  /* Se retiró */
+    --serie: #2a78d6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); color: var(--text-primary);
+         font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .envoltura { max-width: 1480px; margin: 0 auto; padding: 18px 20px 28px; }
+  header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 24px; margin-bottom: 14px; }
+  h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+  .sub { color: var(--text-secondary); margin: 2px 0 0; }
+  .filtros { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+  .filtros label { display: flex; flex-direction: column; font-size: 12px; color: var(--text-secondary); gap: 3px; }
+  select, button { font: inherit; font-size: 13px; padding: 6px 10px; border: 1px solid var(--borde); border-radius: 8px;
+                   background: var(--surface-1); color: var(--text-primary); min-width: 150px; }
+  button { min-width: 0; cursor: pointer; }
+  button:hover, select:hover { border-color: #b9b8b2; }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .kpi { background: var(--surface-1); border: 1px solid var(--borde); border-radius: 12px; padding: 12px 14px; min-width: 0; }
+  .kpi .nombre { font-size: 12px; color: var(--text-secondary); }
+  .kpi .valor { font-size: 26px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi .nota { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .rejilla { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; }
+  .tarjeta { background: var(--surface-1); border: 1px solid var(--borde); border-radius: 12px; padding: 14px 16px 12px; min-width: 0; }
+  .tarjeta h2 { font-size: 15px; margin: 0; }
+  .tarjeta p.lectura { margin: 2px 0 8px; color: var(--text-secondary); font-size: 12.5px; }
+  .c7 { grid-column: span 7; } .c5 { grid-column: span 5; } .c4 { grid-column: span 4; } .c12 { grid-column: span 12; }
+  .lienzo { position: relative; height: 270px; }
+  .leyenda { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--text-secondary); margin: 0 0 6px; }
+  .leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+  .leyenda i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--grid); white-space: nowrap; }
+  th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+  th { font-weight: 600; color: var(--text-secondary); font-size: 12px; }
+  tr.critica td { font-weight: 650; }
+  tr.sel td { background: #eef4fc; }
+  .tabla-scroll { overflow-x: auto; }
+  footer { color: var(--text-muted); font-size: 12px; margin-top: 12px; }
+  .marca { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 6px; border: 1px solid var(--borde); color: var(--text-secondary); margin-left: 6px; }
+  @media (max-width: 1100px) {
+    .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .c7, .c5, .c4 { grid-column: span 12; }
+  }
+  @media (max-width: 560px) {
+    .envoltura { padding: 14px 16px 24px; }
+    .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    select { min-width: 0; width: 100%; }
+    .filtros label { flex: 1 1 140px; }
+  }
+</style>
+</head>
+<body>
+<div class="envoltura">
+  <header>
+    <div>
+      <h1>Rendimiento académico</h1>
+      <p class="sub">32.593 matrículas reales y anónimas de 7 asignaturas · Open University, 2013 y 2014</p>
+    </div>
+    <div class="filtros">
+      <label>Asignatura <select id="f-asig"></select></label>
+      <label>Cohorte <select id="f-coh"></select></label>
+      <label>Formación previa <select id="f-form"></select></label>
+      <button id="limpiar" type="button">Quitar filtros</button>
+    </div>
+  </header>
+
+  <section class="kpis" aria-label="Indicadores">
+    <div class="kpi"><div class="nombre">Matrículas analizadas</div><div class="valor" id="k-n"></div><div class="nota" id="k-n2"></div></div>
+    <div class="kpi"><div class="nombre">Promedio de evaluaciones</div><div class="valor" id="k-prom"></div><div class="nota">de 0 a 100 · se aprueba con 40</div></div>
+    <div class="kpi"><div class="nombre">Tasa de aprobación</div><div class="valor" id="k-apr"></div><div class="nota" id="k-apr2"></div></div>
+    <div class="kpi"><div class="nombre">Tasa de reprobación</div><div class="valor" id="k-rep"></div><div class="nota">terminó y no aprobó</div></div>
+    <div class="kpi"><div class="nombre">Tasa de retiro</div><div class="valor" id="k-ret"></div><div class="nota">se fue antes de terminar</div></div>
+    <div class="kpi"><div class="nombre">Asignatura más crítica</div><div class="valor" id="k-crit"></div><div class="nota" id="k-crit2"></div></div>
+  </section>
+
+  <div class="rejilla">
+    <section class="tarjeta c7">
+      <h2>Niveles de desempeño por asignatura</h2>
+      <p class="lectura">Ordenadas de la más crítica a la menos crítica. Haga clic en una barra para filtrar por esa asignatura.</p>
+      <div class="leyenda" id="leyenda-niveles"></div>
+      <div class="lienzo" style="height:300px"><canvas id="g-niveles" aria-label="Niveles de desempeño por asignatura"></canvas></div>
+    </section>
+    <section class="tarjeta c5">
+      <h2>Promedio de evaluaciones por asignatura</h2>
+      <p class="lectura">Mismo orden que la gráfica de al lado: el promedio no sigue el orden de la aprobación.</p>
+      <div class="lienzo" style="height:322px"><canvas id="g-promedio" aria-label="Promedio de evaluaciones por asignatura"></canvas></div>
+    </section>
+    <section class="tarjeta c4">
+      <h2>Entrega de cada evaluación del semestre</h2>
+      <p class="lectura">De cada 100 matriculados, cuántos entregaron la evaluación.</p>
+      <div class="lienzo"><canvas id="g-entrega" aria-label="Porcentaje de entrega por evaluación"></canvas></div>
+    </section>
+    <section class="tarjeta c4">
+      <h2>Aprobación según la primera evaluación</h2>
+      <p class="lectura">Nota en la primera evaluación del semestre, que en cinco de las siete asignaturas llega entre los días 12 y 25.</p>
+      <div class="lienzo"><canvas id="g-primera" aria-label="Aprobación según la nota de la primera evaluación"></canvas></div>
+    </section>
+    <section class="tarjeta c4">
+      <h2>Aprobación según la actividad del primer mes</h2>
+      <p class="lectura">Clics en la plataforma en las primeras 4 semanas, en cinco grupos del mismo tamaño (debajo, el rango de clics).</p>
+      <div class="lienzo"><canvas id="g-clics" aria-label="Aprobación según los clics en las primeras cuatro semanas"></canvas></div>
+    </section>
+    <section class="tarjeta c12">
+      <h2>Tabla por asignatura</h2>
+      <p class="lectura">Las mismas cifras de las gráficas, con los filtros de cohorte y formación previa aplicados.</p>
+      <div class="tabla-scroll"><table id="tabla"></table></div>
+    </section>
+  </div>
+
+  <footer>
+    Fuente: Open University Learning Analytics Dataset (Kuzilek, Hlosta y Zdrahal, 2017), licencia CC BY 4.0. Datos reales anonimizados; las asignaturas solo vienen con código.
+    Aprobación = Distinción + Aprobó sobre todas las matrículas. Promedio = nota media de las evaluaciones entregadas.
+    Los dos patrones de abajo solo cuentan a quienes seguían inscritos el día de la primera evaluación o al terminar la semana 4.
+  </footer>
+</div>
+
+<script src="chart.umd.js"></script>
+<script src="datos.js"></script>
+<script>
+(() => {
+  const D = window.DATOS;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const C = {
+    niveles: [css('--nivel-1'), css('--nivel-2'), css('--nivel-3'), css('--nivel-4')],
+    serie: css('--serie'), sup: css('--surface-1'), t1: css('--text-primary'), t2: css('--text-secondary'),
+    t3: css('--text-muted'), grid: css('--grid'),
+  };
+  const nombreAsig = Object.fromEntries(D.asignaturas.map(a => [a.id, `${a.id} · ${a.area}`]));
+  const fmt = (x, d = 1) => x.toLocaleString('es-CO', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const ent = x => x.toLocaleString('es-CO');
+  const pct = (a, b) => b ? 100 * a / b : 0;
+
+  // filtros
+  const sel = { a: '', c: '', f: '' };
+  const llenar = (id, ops, todas) => {
+    const s = document.getElementById(id);
+    s.innerHTML = `<option value="">${todas}</option>` + ops.map(o => `<option value="${o.v}">${o.t}</option>`).join('');
+    return s;
+  };
+  const sA = llenar('f-asig', D.asignaturas.map(a => ({ v: a.id, t: nombreAsig[a.id] })), 'Todas');
+  const sC = llenar('f-coh', D.cohortes.map(c => ({ v: c, t: c })), 'Todas');
+  const sF = llenar('f-form', D.formaciones.map(f => ({ v: f, t: f })), 'Todas');
+  sA.onchange = () => { sel.a = sA.value; pintar(); };
+  sC.onchange = () => { sel.c = sC.value; pintar(); };
+  sF.onchange = () => { sel.f = sF.value; pintar(); };
+  document.getElementById('limpiar').onclick = () => { sel.a = sel.c = sel.f = ''; sA.value = sC.value = sF.value = ''; pintar(); };
+
+  document.getElementById('leyenda-niveles').innerHTML =
+    D.resultados.map((r, i) => `<span><i style="background:${C.niveles[i]}"></i>${r}</span>`).join('');
+
+  // suma de grupos
+  const sumar = grupos => {
+    const s = { n: 0, r: [0, 0, 0, 0], sp: 0, np: 0,
+                ev: Array.from({ length: D.max_orden }, () => [0, 0, 0]),
+                p1: D.rangos_nota.map(() => [0, 0]), q4: [0, 1, 2, 3, 4].map(() => [0, 0]) };
+    for (const g of grupos) {
+      s.n += g.n; s.sp += g.sp; s.np += g.np;
+      g.r.forEach((v, i) => s.r[i] += v);
+      g.ev.forEach((v, i) => { s.ev[i][0] += v[0]; s.ev[i][1] += v[1]; s.ev[i][2] += v[2]; });
+      g.p1.forEach((v, i) => { s.p1[i][0] += v[0]; s.p1[i][1] += v[1]; });
+      g.q4.forEach((v, i) => { s.q4[i][0] += v[0]; s.q4[i][1] += v[1]; });
+    }
+    s.apr = pct(s.r[0] + s.r[1], s.n);
+    s.prom = s.np ? s.sp / s.np : 0;
+    return s;
+  };
+  const pasaCF = g => (!sel.c || g.c === sel.c) && (!sel.f || g.f === sel.f);
+
+  Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = C.t2;
+  Chart.defaults.plugins.legend.display = false;
+  Chart.defaults.animation.duration = 250;
+  const tip = { backgroundColor: '#1f1f1d', titleColor: '#fff', bodyColor: '#f0efec', padding: 10, cornerRadius: 8,
+                displayColors: true, boxPadding: 4 };
+  const ejes = (yMax, ySuf) => ({
+    x: { grid: { display: false }, border: { color: C.grid }, ticks: { color: C.t2, maxRotation: 0, autoSkip: false } },
+    y: { min: 0, max: yMax, grid: { color: C.grid }, border: { display: false },
+         ticks: { color: C.t3, callback: v => v + ySuf, maxTicksLimit: 6 } },
+  });
+  // etiqueta de valor encima de cada barra (pocas barras: se rotulan todas)
+  const rotulos = {
+    id: 'rotulos',
+    afterDatasetsDraw(ch, _, o) {
+      if (!o || !o.activo) return;
+      const ctx = ch.ctx; ctx.save();
+      ctx.font = `600 12px ${Chart.defaults.font.family}`; ctx.fillStyle = C.t1; ctx.textAlign = 'center';
+      ch.getDatasetMeta(0).data.forEach((b, i) => {
+        const v = ch.data.datasets[0].data[i];
+        if (v == null) return;
+        ctx.fillText(fmt(v) + (o.suf || ''), b.x, b.y - 6);
+      });
+      ctx.restore();
+    },
+  };
+  Chart.register(rotulos);
+
+  // 1. niveles por asignatura (barras apiladas al 100 %)
+  const gNiv = new Chart(document.getElementById('g-niveles'), {
+    type: 'bar',
+    data: { labels: [], datasets: D.resultados.map((r, i) => ({ label: r, data: [], backgroundColor: [],
+            borderColor: C.sup, borderWidth: { left: 0, right: 2, top: 0, bottom: 0 }, borderSkipped: false, barPercentage: 0.78 })) },
+    options: {
+      indexAxis: 'y', maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true, min: 0, max: 100, grid: { color: C.grid }, border: { display: false }, ticks: { color: C.t3, callback: v => v + ' %' } },
+        y: { stacked: true, grid: { display: false }, border: { color: C.grid }, ticks: { color: C.t1 } },
+      },
+      plugins: { tooltip: { ...tip, mode: 'index', callbacks: {
+        title: it => nombreAsig[gNiv._ids[it[0].dataIndex]],
+        label: it => ` ${it.dataset.label}: ${fmt(it.raw)} %  (${ent(gNiv._cuentas[it.dataIndex][it.datasetIndex])})`,
+        footer: it => `Aprobación: ${fmt(it[0].raw + it[1].raw)} % · ${ent(gNiv._n[it[0].dataIndex])} matrículas`,
+      } } },
+      onClick: (_, els) => {
+        if (!els.length) return;
+        const id = gNiv._ids[els[0].index];
+        sel.a = sel.a === id ? '' : id; sA.value = sel.a; pintar();
+      },
+      onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+    },
+  });
+
+  // 2. promedio por asignatura
+  const gProm = new Chart(document.getElementById('g-promedio'), {
+    type: 'bar',
+    data: { labels: [], datasets: [{ label: 'Promedio', data: [], backgroundColor: [], borderRadius: 4, borderSkipped: 'start', barPercentage: 0.7 }] },
+    options: {
+      indexAxis: 'y', maintainAspectRatio: false,
+      scales: {
+        x: { min: 0, max: 100, grid: { color: C.grid }, border: { display: false }, ticks: { color: C.t3 } },
+        y: { grid: { display: false }, border: { color: C.grid }, ticks: { color: C.t1 } },
+      },
+      plugins: {
+        tooltip: { ...tip, displayColors: false, callbacks: {
+          title: it => nombreAsig[gProm._ids[it[0].dataIndex]],
+          label: it => `Promedio: ${fmt(it.raw)} de 100`,
+          afterLabel: it => `Aprobación: ${fmt(gProm._apr[it.dataIndex])} %`,
+        } },
+      },
+      onClick: (_, els) => {
+        if (!els.length) return;
+        const id = gProm._ids[els[0].index];
+        sel.a = sel.a === id ? '' : id; sA.value = sel.a; pintar();
+      },
+      onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+    },
+    plugins: [{
+      id: 'valorFinal',
+      afterDatasetsDraw(ch) {
+        const ctx = ch.ctx; ctx.save();
+        ctx.font = `600 12px ${Chart.defaults.font.family}`; ctx.fillStyle = C.t1; ctx.textBaseline = 'middle';
+        ch.getDatasetMeta(0).data.forEach((b, i) => ctx.fillText(fmt(ch.data.datasets[0].data[i]), b.x + 6, b.y));
+        ctx.restore();
+      },
+    }],
+  });
+
+  // 3. entrega por evaluación (línea)
+  const gEnt = new Chart(document.getElementById('g-entrega'), {
+    type: 'line',
+    data: { labels: [], datasets: [{ label: 'Entregaron', data: [], borderColor: C.serie, backgroundColor: C.serie,
+            borderWidth: 2, pointRadius: 4, pointHoverRadius: 6, pointBorderColor: C.sup, pointBorderWidth: 2, tension: 0 }] },
+    options: {
+      maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      scales: ejes(100, ' %'),
+      plugins: { tooltip: { ...tip, displayColors: false, callbacks: {
+        title: it => `Evaluación ${it[0].label} del semestre`,
+        label: it => `Entregaron: ${fmt(it.raw)} % de los matriculados`,
+        afterLabel: it => `Promedio de quienes entregaron: ${fmt(gEnt._prom[it.dataIndex])}`,
+      } } },
+    },
+    plugins: [{
+      id: 'cruz',
+      afterDatasetsDraw(ch) {
+        const a = ch.tooltip && ch.tooltip.getActiveElements();
+        if (!a || !a.length) return;
+        const x = a[0].element.x, { top, bottom } = ch.chartArea, ctx = ch.ctx;
+        ctx.save(); ctx.strokeStyle = C.t3; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); ctx.restore();
+      },
+    }],
+  });
+
+  // 4 y 5. tasas de aprobación por grupo
+  const barrasTasa = (id, etiquetas, titulo) => new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels: etiquetas, datasets: [{ label: 'Aprobación', data: [], backgroundColor: C.serie, borderRadius: 4,
+            borderSkipped: 'start', barPercentage: 0.72 }] },
+    options: {
+      maintainAspectRatio: false, layout: { padding: { top: 18 } },
+      scales: ejes(100, ' %'),
+      plugins: {
+        rotulos: { activo: true, suf: ' %' },
+        tooltip: { ...tip, displayColors: false, callbacks: {
+          title: it => titulo(it[0]),
+          label: it => `Aprobación: ${fmt(it.raw)} %`,
+          afterLabel: it => `${ent(it.chart._n[it.dataIndex])} estudiantes en el grupo`,
+        } },
+      },
+    },
+  });
+  const gPri = barrasTasa('g-primera', [['No la', 'entregó'], ['Menos', 'de 40'], ['40 a 59'], ['60 a 79'], ['80 a 100']], it => `Primera evaluación: ${D.rangos_nota[it.dataIndex].toLowerCase()}`);
+  const gCli = barrasTasa('g-clics', D.quintiles.map((q, i, l) => [`Grupo ${i + 1}`, i === 0 ? `hasta ${q.split(' a ')[1]}` : i === l.length - 1 ? `${q.split(' a ')[0]} o más` : q]), it => `Grupo ${it.dataIndex + 1}: ${D.quintiles[it.dataIndex]} clics en el primer mes`);
+
+  function pintar() {
+    const gruposCF = D.grupos.filter(pasaCF);
+    const gruposSel = gruposCF.filter(g => !sel.a || g.a === sel.a);
+    const s = sumar(gruposSel);
+
+    // por asignatura (para gráficas 1 y 2, la tabla y el KPI crítico)
+    const porA = D.asignaturas.map(a => ({ id: a.id, area: a.area, ...sumar(gruposCF.filter(g => g.a === a.id)) }))
+      .filter(x => x.n > 0).sort((x, y) => x.apr - y.apr);
+    const candidatas = porA.filter(x => x.n >= 30 && (!sel.a || x.id === sel.a));
+    const crit = candidatas[0];
+
+    // KPI
+    document.getElementById('k-n').textContent = ent(s.n);
+    document.getElementById('k-n2').textContent = sel.a || sel.c || sel.f ? 'con los filtros aplicados' : '28.785 estudiantes distintos';
+    document.getElementById('k-prom').textContent = s.np ? fmt(s.prom) : 'sin datos';
+    document.getElementById('k-apr').textContent = fmt(s.apr) + ' %';
+    document.getElementById('k-apr2').textContent = `distinción ${fmt(pct(s.r[0], s.n))} % + aprobó ${fmt(pct(s.r[1], s.n))} %`;
+    document.getElementById('k-rep').textContent = fmt(pct(s.r[2], s.n)) + ' %';
+    document.getElementById('k-ret').textContent = fmt(pct(s.r[3], s.n)) + ' %';
+    document.getElementById('k-crit').textContent = crit ? crit.id : 'sin datos';
+    document.getElementById('k-crit2').textContent = crit ? `${crit.area.toLowerCase()} · aprueba el ${fmt(crit.apr)} %` : 'muy pocos registros';
+
+    // 1. niveles
+    const atenuar = (color, id) => sel.a && sel.a !== id ? color + '55' : color;
+    gNiv._ids = porA.map(x => x.id); gNiv._n = porA.map(x => x.n); gNiv._cuentas = porA.map(x => x.r);
+    gNiv.data.labels = porA.map(x => x.id + (x === porA[0] ? '  (crítica)' : ''));
+    gNiv.data.datasets.forEach((ds, i) => {
+      ds.data = porA.map(x => +pct(x.r[i], x.n).toFixed(1));
+      ds.backgroundColor = porA.map(x => atenuar(C.niveles[i], x.id));
+    });
+    gNiv.update();
+
+    // 2. promedio, mismo orden
+    gProm._ids = porA.map(x => x.id); gProm._apr = porA.map(x => x.apr);
+    gProm.data.labels = porA.map(x => x.id);
+    gProm.data.datasets[0].data = porA.map(x => +x.prom.toFixed(1));
+    gProm.data.datasets[0].backgroundColor = porA.map(x => atenuar(C.serie, x.id));
+    gProm.update();
+
+    // 3. entrega
+    const ev = s.ev.map((v, i) => ({ k: i + 1, ins: v[0], e: v[1], suma: v[2] })).filter(v => v.ins > 0);
+    gEnt._prom = ev.map(v => v.e ? v.suma / v.e : 0);
+    gEnt.data.labels = ev.map(v => String(v.k));
+    gEnt.data.datasets[0].data = ev.map(v => +pct(v.e, v.ins).toFixed(1));
+    gEnt.update();
+
+    // 4 y 5
+    gPri._n = s.p1.map(v => v[1]);
+    gPri.data.datasets[0].data = s.p1.map(v => v[1] >= 20 ? +pct(v[0], v[1]).toFixed(1) : null);
+    gPri.update();
+    gCli._n = s.q4.map(v => v[1]);
+    gCli.data.datasets[0].data = s.q4.map(v => v[1] >= 20 ? +pct(v[0], v[1]).toFixed(1) : null);
+    gCli.update();
+
+    // tabla
+    const filas = porA.map((x, i) => `<tr class="${i === 0 ? 'critica' : ''} ${sel.a === x.id ? 'sel' : ''}">
+      <td>${x.id}${i === 0 ? '<span class="marca">más crítica</span>' : ''}</td><td>${x.area}</td>
+      <td>${ent(x.n)}</td><td>${fmt(x.prom)}</td><td>${fmt(x.apr)} %</td><td>${fmt(pct(x.r[0], x.n))} %</td>
+      <td>${fmt(pct(x.r[1], x.n))} %</td><td>${fmt(pct(x.r[2], x.n))} %</td><td>${fmt(pct(x.r[3], x.n))} %</td></tr>`).join('');
+    document.getElementById('tabla').innerHTML = `<thead><tr><th>Asignatura</th><th>Área</th><th>Matrículas</th><th>Promedio</th>
+      <th>Aprobación</th><th>Distinción</th><th>Aprobó</th><th>Reprobó</th><th>Se retiró</th></tr></thead><tbody>${filas}</tbody>`;
+  }
+  // filtro desde la dirección, por ejemplo #asig=CCC (sirve para capturas y para el video)
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.get('asig')) { sel.a = sA.value = h.get('asig'); }
+  if (h.get('coh')) { sel.c = sC.value = h.get('coh'); }
+  if (h.get('form')) { sel.f = sF.value = h.get('form'); }
+  pintar();
+})();
+</script>
+</body>
+</html>

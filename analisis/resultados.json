@@ -1,0 +1,265 @@
+{
+ "fuente": "Open University Learning Analytics Dataset (Kuzilek et al., 2017), CC BY 4.0",
+ "limpieza": {
+  "matriculas_leidas": 32593,
+  "matriculas_duplicadas": 0,
+  "notas_leidas": 173912,
+  "notas_sin_puntaje": 173,
+  "notas_fuera_de_rango": 0,
+  "notas_trasladadas_de_intento_anterior": 1909,
+  "examenes_sin_fecha": 11,
+  "imd_vacio": 0
+ },
+ "general": {
+  "n": 32593,
+  "Distinción": 9.3,
+  "Aprobó": 37.9,
+  "Reprobó": 21.6,
+  "Se retiró": 31.2,
+  "aprobacion": 47.2,
+  "promedio": 72.8,
+  "estudiantes_unicos": 28785,
+  "sin_ninguna_nota": 6773
+ },
+ "por_asignatura": {
+  "AAA": {
+   "n": 748,
+   "Distinción": 5.9,
+   "Aprobó": 65.1,
+   "Reprobó": 12.2,
+   "Se retiró": 16.8,
+   "aprobacion": 71.0,
+   "promedio": 68.3,
+   "area": "Ciencias sociales"
+  },
+  "BBB": {
+   "n": 7909,
+   "Distinción": 8.6,
+   "Aprobó": 38.9,
+   "Reprobó": 22.3,
+   "Se retiró": 30.2,
+   "aprobacion": 47.5,
+   "promedio": 73.4,
+   "area": "Ciencias sociales"
+  },
+  "CCC": {
+   "n": 4434,
+   "Distinción": 11.2,
+   "Aprobó": 26.6,
+   "Reprobó": 17.6,
+   "Se retiró": 44.5,
+   "aprobacion": 37.8,
+   "promedio": 67.1,
+   "area": "Ciencias e ingeniería"
+  },
+  "DDD": {
+   "n": 6272,
+   "Distinción": 6.1,
+   "Aprobó": 35.5,
+   "Reprobó": 22.5,
+   "Se retiró": 35.9,
+   "aprobacion": 41.6,
+   "promedio": 67.6,
+   "area": "Ciencias e ingeniería"
+  },
+  "EEE": {
+   "n": 2934,
+   "Distinción": 12.1,
+   "Aprobó": 44.1,
+   "Reprobó": 19.2,
+   "Se retiró": 24.6,
+   "aprobacion": 56.2,
+   "promedio": 80.1,
+   "area": "Ciencias e ingeniería"
+  },
+  "FFF": {
+   "n": 7762,
+   "Distinción": 8.6,
+   "Aprobó": 38.4,
+   "Reprobó": 22.0,
+   "Se retiró": 31.0,
+   "aprobacion": 47.0,
+   "promedio": 75.6,
+   "area": "Ciencias e ingeniería"
+  },
+  "GGG": {
+   "n": 2534,
+   "Distinción": 15.6,
+   "Aprobó": 44.1,
+   "Reprobó": 28.7,
+   "Se retiró": 11.5,
+   "aprobacion": 59.7,
+   "promedio": 77.5,
+   "area": "Ciencias sociales"
+  }
+ },
+ "asignatura_critica": "CCC",
+ "patron_primera_evaluacion": {
+  "40 a 59": {
+   "n": 2938,
+   "Distinción": 1.7,
+   "Aprobó": 33.2,
+   "Reprobó": 39.1,
+   "Se retiró": 26.0,
+   "aprobacion": 34.9
+  },
+  "60 a 79": {
+   "n": 9415,
+   "Distinción": 6.4,
+   "Aprobó": 51.3,
+   "Reprobó": 24.7,
+   "Se retiró": 17.6,
+   "aprobacion": 57.7
+  },
+  "80 a 100": {
+   "n": 11169,
+   "Distinción": 20.5,
+   "Aprobó": 53.4,
+   "Reprobó": 15.0,
+   "Se retiró": 11.2,
+   "aprobacion": 73.9
+  },
+  "Menos de 40": {
+   "n": 1510,
+   "Distinción": 5.1,
+   "Aprobó": 30.9,
+   "Reprobó": 28.5,
+   "Se retiró": 35.5,
+   "aprobacion": 36.0
+  },
+  "No la entregó": {
+   "n": 2872,
+   "Distinción": 0.2,
+   "Aprobó": 4.4,
+   "Reprobó": 51.2,
+   "Se retiró": 44.2,
+   "aprobacion": 4.6
+  }
+ },
+ "patron_clics_4_semanas": {
+  "0": {
+   "n": 5511,
+   "Distinción": 5.1,
+   "Aprobó": 30.1,
+   "Reprobó": 42.8,
+   "Se retiró": 22.0,
+   "aprobacion": 35.2,
+   "min": 0,
+   "max": 66
+  },
+  "1": {
+   "n": 5510,
+   "Distinción": 7.8,
+   "Aprobó": 41.1,
+   "Reprobó": 29.9,
+   "Se retiró": 21.3,
+   "aprobacion": 48.8,
+   "min": 66,
+   "max": 162
+  },
+  "2": {
+   "n": 5511,
+   "Distinción": 9.2,
+   "Aprobó": 46.9,
+   "Reprobó": 24.1,
+   "Se retiró": 19.8,
+   "aprobacion": 56.1,
+   "min": 162,
+   "max": 295
+  },
+  "3": {
+   "n": 5510,
+   "Distinción": 12.7,
+   "Aprobó": 52.0,
+   "Reprobó": 18.5,
+   "Se retiró": 16.8,
+   "aprobacion": 64.7,
+   "min": 295,
+   "max": 543
+  },
+  "4": {
+   "n": 5511,
+   "Distinción": 20.1,
+   "Aprobó": 54.2,
+   "Reprobó": 12.6,
+   "Se retiró": 13.1,
+   "aprobacion": 74.3,
+   "min": 543,
+   "max": 7570
+  }
+ },
+ "por_formacion": {
+  "Estudios superiores": {
+   "n": 4730,
+   "Distinción": 14.7,
+   "Aprobó": 41.4,
+   "Reprobó": 16.7,
+   "Se retiró": 27.1,
+   "aprobacion": 56.2
+  },
+  "Posgrado": {
+   "n": 313,
+   "Distinción": 28.1,
+   "Aprobó": 37.4,
+   "Reprobó": 10.9,
+   "Se retiró": 23.6,
+   "aprobacion": 65.5
+  },
+  "Secundaria completa": {
+   "n": 14045,
+   "Distinción": 10.7,
+   "Aprobó": 41.4,
+   "Reprobó": 19.3,
+   "Se retiró": 28.7,
+   "aprobacion": 52.0
+  },
+  "Secundaria incompleta": {
+   "n": 13158,
+   "Distinción": 5.5,
+   "Aprobó": 33.3,
+   "Reprobó": 26.0,
+   "Se retiró": 35.1,
+   "aprobacion": 38.9
+  },
+  "Sin estudios formales": {
+   "n": 347,
+   "Distinción": 4.6,
+   "Aprobó": 25.1,
+   "Reprobó": 27.4,
+   "Se retiró": 42.9,
+   "aprobacion": 29.7
+  }
+ },
+ "por_intentos_previos": {
+  "0": {
+   "n": 28421,
+   "Distinción": 10.1,
+   "Aprobó": 39.2,
+   "Reprobó": 20.2,
+   "Se retiró": 30.6,
+   "aprobacion": 49.3
+  },
+  "1": {
+   "n": 3299,
+   "Distinción": 4.3,
+   "Aprobó": 30.2,
+   "Reprobó": 30.6,
+   "Se retiró": 34.9,
+   "aprobacion": 34.6
+  },
+  "2 o más": {
+   "n": 873,
+   "Distinción": 2.7,
+   "Aprobó": 24.7,
+   "Reprobó": 35.7,
+   "Se retiró": 36.8,
+   "aprobacion": 27.5
+  }
+ },
+ "promedio_por_nivel": {
+  "Aprobó": 76.2,
+  "Distinción": 88.5,
+  "Reprobó": 64.2,
+  "Se retiró": 64.1
+ }
+}
